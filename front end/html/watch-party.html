@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLIXORA — Watch Party</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #060608; color: #fff; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; height: 100vh; }
+        
+        /* Layout Structure */
+        .wp-container { display: flex; height: 100vh; width: 100vw; position: relative; }
+        
+        /* Video Area */
+        .video-section { flex: 1; position: relative; background: #000; display: flex; flex-direction: column; }
+        .wp-header { position: absolute; top: 0; left: 0; right: 0; padding: 1rem 2rem; z-index: 10; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
+        .video-player-mock { width: 100%; height: 100%; object-fit: cover; }
+
+        /* Chat Sidebar */
+        .chat-sidebar { width: 340px; background: rgba(12, 14, 18, 0.95); border-left: 1px solid #222; display: flex; flex-direction: column; height: 100%; }
+        .chat-header { padding: 1.2rem; border-bottom: 1px solid #222; font-weight: bold; display: flex; align-items: center; gap: 0.5rem; color: #fff; }
+        
+        .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
+        .chat-bubble { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); padding: 0.8rem 1rem; border-radius: 10px; font-size: 0.88rem; line-height: 1.4; }
+        .chat-bubble.me { background: rgba(212, 175, 55, 0.15); border-color: rgba(212, 175, 55, 0.3); }
+        .chat-user { font-size: 0.75rem; font-weight: bold; color: #d4af37; margin-bottom: 0.3rem; display: block; }
+
+        /* Chat Input Box Fixed */
+        .chat-input-area { padding: 1rem; border-top: 1px solid #222; background: rgba(6, 6, 8, 0.9); display: flex; gap: 0.5rem; align-items: center; }
+        .chat-input-area input { flex: 1; background: rgba(255,255,255,0.08); border: 1px solid #333; padding: 0.75rem 1rem; border-radius: 20px; color: #fff; outline: none; font-size: 0.85rem; }
+        .chat-input-area input:focus { border-color: #d4af37; }
+        .chat-input-area button { background: #d4af37; color: #000; border: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+        .chat-input-area button:hover { background: #f3c63f; }
+    </style>
+</head>
+<body>
+
+    <div class="wp-container">
+        
+        <!-- Sidebar Chat Area -->
+        <aside class="chat-sidebar">
+            <div class="chat-header">
+                <i class="fa-solid fa-comments" style="color: #d4af37;"></i>
+                <span>الدردشة المباشرة</span>
+            </div>
+
+            <!-- Messages List -->
+            <div class="chat-messages" id="chat-messages-list">
+                <div class="chat-bubble">
+                    <span class="chat-user">أحمد</span>
+                    المشهد البصري للثقب الأسود مذهل للغاية! 🚀
+                </div>
+                <div class="chat-bubble">
+                    <span class="chat-user">سارة</span>
+                    الموسيقى التصويرية لهانز زيمر تجعل المشهد تقشعر له الأبدان! 🔥
+                </div>
+                <div class="chat-bubble me">
+                    <span class="chat-user" style="color: #fff;">أنت (سوزان)</span>
+                    انتظروا اللقطة القادمة، ستكون الحبكة تصاعدية! 🎬
+                </div>
+            </div>
+
+            <!-- Input Box Component -->
+            <form class="chat-input-area" onsubmit="sendMessage(event)">
+                <input type="text" id="wp-msg-input" placeholder="اكتب رسالتك هنا..." required autocomplete="off">
+                <button type="submit" title="إرسال">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+        </aside>
+
+        <!-- Main Video Content Area -->
+        <main class="video-section">
+            <div class="wp-header">
+                <a href="home.html" style="color: #ff4d4d; text-decoration: none; font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 0.4rem;">
+                    <i class="fa-solid fa-door-open"></i> مغادرة
+                </a>
+                <div style="color: #4cd137; font-size: 0.85rem; font-weight: bold;">
+                    ● غرفة: سينما سوزان والأصدقاء
+                </div>
+                <div style="font-size: 1.2rem; font-weight: bold; color: #fff;">
+                    FLIXORA<span style="color: #d4af37;">.</span>
+                </div>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600" alt="Stream Preview" class="video-player-mock">
+        </main>
+
+    </div>
+
+    <script>
+        function sendMessage(event) {
+            event.preventDefault();
+            const input = document.getElementById('wp-msg-input');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            const chatList = document.getElementById('chat-messages-list');
+            
+            // إضافة الرسالة إلى الشاشة
+            const newMsg = document.createElement('div');
+            newMsg.className = 'chat-bubble me';
+            newMsg.innerHTML = `
+                <span class="chat-user" style="color: #fff;">أنت (سوزان)</span>
+                ${message}
+            `;
+
+            chatList.appendChild(newMsg);
+            input.value = '';
+            
+            // التمرير التلقائي للأسفل عند الإرسال
+            chatList.scrollTop = chatList.scrollHeight;
+        }
+    </script>
+</body>
+</html>

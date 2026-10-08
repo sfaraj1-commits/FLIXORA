@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLIXORA — AI Assistant</title>
+    
+    <!-- منع إعادة التوجيه وتثبيت الجلسة -->
+    <script>
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('loggedIn', 'true');
+        localStorage.setItem('flixora_token', 'demo_active_token_123');
+    </script>
+
+    <!-- CSS References -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="padding-top: 80px; background: #060608; min-height: 100vh; display: flex; flex-direction: column;">
+
+    <!-- Navigation Header -->
+    <nav class="navbar" style="position: fixed; top: 0; width: 100%; z-index: 1000; background: rgba(6, 6, 8, 0.85); backdrop-filter: blur(15px); border-bottom: 1px solid #222;">
+        <div style="display: flex; align-items: center; gap: 3rem; padding: 0.8rem 2rem;">
+            <a href="home.html" class="logo" style="text-decoration: none; color: #fff; font-weight: bold; font-size: 1.5rem;">
+                <i class="fa-solid fa-film" style="color: #d4af37;"></i> FLIXORA<span style="color: #d4af37;">.</span>
+            </a>
+            <ul class="nav-links" style="display: flex; gap: 1.8rem; list-style: none; margin: 0;">
+                <li><a href="home.html" style="color: #aaa; text-decoration: none;"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
+                <li><a href="browse.html" style="color: #aaa; text-decoration: none;"><i class="fa-solid fa-compass"></i> استكشف</a></li>
+                <li><a href="trending.html" style="color: #aaa; text-decoration: none;"><i class="fa-solid fa-fire"></i> الأحدث</a></li>
+                <li><a href="ai-assistant.html" class="active" style="color: #d4af37; text-decoration: none;"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Assistant</a></li>
+                <li><a href="watch-party.html" style="color: #aaa; text-decoration: none;"><i class="fa-solid fa-users"></i> Watch Party</a></li>
+                <li><a href="my-list.html" style="color: #aaa; text-decoration: none;"><i class="fa-solid fa-bookmark"></i> قائمتي</a></li>
+            </ul>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 1.5rem; padding-left: 2rem;">
+            <a href="profile.html" style="display: flex; align-items: center; gap: 0.8rem; text-decoration: none;">
+                <img id="nav-profile-avatar" src="https://i.pravatar.cc/100?img=33" alt="User Profile" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover;">
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main style="flex: 1; padding: 2rem 4rem; display: flex; flex-direction: column; max-width: 1200px; margin: 0 auto; width: 100%;">
+        
+        <!-- Header Info -->
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <span style="background: rgba(212, 175, 55, 0.15); border: 1px solid #d4af37; color: #d4af37; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: bold; font-size: 0.85rem; display: inline-block;">
+                <i class="fa-solid fa-sparkles"></i> Flixora AI Engine v2.5
+            </span>
+            <h1 style="font-size: 2.2rem; font-weight: 800; color: #fff; margin-top: 0.5rem;">مساعدك السينمائي الذكي</h1>
+            <p style="color: #aaa; font-size: 0.95rem; margin-top: 0.4rem;">
+                صف ما تريد مشاهدته، وسيرشح لك الذكاء الاصطناعي قائمة مخصصة بالترشيحات لبدء البث المباشر فوراً.
+            </p>
+        </div>
+
+        <!-- Chat Container Box -->
+        <div style="flex: 1; background: rgba(18, 20, 26, 0.85); border: 1px solid rgba(212, 175, 55, 0.3); backdrop-filter: blur(20px); border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8);">
+            
+            <!-- Chat Messages Box -->
+            <div id="chat-messages" style="flex: 1; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.2rem; min-height: 380px; max-height: 520px;">
+                
+                <!-- Initial AI Welcome Message -->
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: #d4af37; display: flex; align-items: center; justify-content: center; color: #000; font-size: 1.1rem; flex-shrink: 0;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1rem 1.2rem; border-radius: 12px; border-top-right-radius: 0; max-width: 80%; color: #fff; line-height: 1.6;">
+                        <p style="margin: 0; font-size: 0.95rem;" id="welcome-message">
+                            أهلاً بك! 👋 أنا مستشارك السينمائي. اخبرني ماذا تفضل أن تشاهد اليوم ليتم عرض القائمة المناسبة لك؟
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Suggestion Chips Bar -->
+            <div style="padding: 0.8rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 0.8rem; overflow-x: auto; background: rgba(6, 6, 8, 0.4);">
+                <button type="button" class="chip-btn" onclick="sendQuickPrompt('عرض قائمة مسلسلات قصيرة ممتعة')">📺 مسلسلات قصيرة متكاملة</button>
+                <button type="button" class="chip-btn" onclick="sendQuickPrompt('عرض قائمة أفلام خيال علمي وفضاء')">🚀 أفلام خيال علمي</button>
+                <button type="button" class="chip-btn" onclick="sendQuickPrompt('عرض قائمة أفلام أكشن وإثارة')">🏎️ أكشن وحماس</button>
+            </div>
+
+            <!-- Input Bar -->
+            <form id="ai-input-form" onsubmit="handleFormSubmit(event)" style="padding: 1rem 1.5rem; border-top: 1px solid #222; display: flex; gap: 0.8rem; align-items: center; background: rgba(12, 14, 18, 0.9);">
+                <button type="button" id="btn-voice" onclick="alert('الميكروفون جاهز للاستماع...')" style="background: rgba(255,255,255,0.08); border: 1px solid #333; color: #d4af37; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="البحث الصوتي">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+
+                <input type="text" id="ai-user-input" placeholder="اكتب ما يدور في ذهنك أو صف شعورك..." required style="flex: 1; padding: 0.85rem 1.2rem; background: rgba(6, 6, 8, 0.7); border: 1px solid #333; border-radius: 25px; color: #fff; font-size: 0.95rem; outline: none;">
+
+                <button type="submit" style="padding: 0.85rem 1.6rem; border-radius: 25px; font-size: 0.95rem; background: #d4af37; color: #000; font-weight: bold; border: none; cursor: pointer;">
+                    إرسال <i class="fa-solid fa-paper-plane" style="margin-right: 5px;"></i>
+                </button>
+            </form>
+
+        </div>
+    </main>
+
+    <style>
+        .chip-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            color: #aaa;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .chip-btn:hover {
+            border-color: #d4af37;
+            color: #fff;
+            background: rgba(212, 175, 55, 0.15);
+        }
+
+        /* شبكة عرض كروت الأفلام والمسلسلات */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1rem;
+            margin-top: 0.8rem;
+        }
+        .media-card {
+            background: rgba(10, 12, 16, 0.8);
+            border: 1px solid #2a2a35;
+            border-radius: 12px;
+            padding: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .media-card:hover {
+            border-color: #d4af37;
+            transform: translateY(-3px);
+        }
+        .stream-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: #d4af37;
+            color: #000;
+            padding: 0.6rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-top: 0.8rem;
+            transition: background 0.2s;
+        }
+        .stream-btn:hover {
+            background: #f3c63f;
+        }
+    </style>
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userName = localStorage.getItem('flixora_current_user') || 'صديقي';
+            const userAvatar = localStorage.getItem('flixora_current_avatar');
+            
+            const welcomeMsg = document.getElementById('welcome-message');
+            if (welcomeMsg) {
+                welcomeMsg.innerHTML = `أهلاً بك يا <b>${userName}</b>! 👋 أنا مستشارك السينمائي. اختر من القوائم السريعة أو اكتب طلبك لإظهار قائمة التشغيل.`;
+            }
+
+            if (userAvatar) {
+                const avatarImg = document.getElementById('nav-profile-avatar');
+                if (avatarImg) avatarImg.src = userAvatar;
+            }
+        });
+
+        // قاعدة بيانات الاقتراحات
+        const seriesData = [
+            { title: "Chernobyl", desc: "كارثة تاريخية - 5 حلقات متكاملة", rating: "9.4", poster: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300" },
+            { title: "The Queen's Gambit", desc: "دراما وذكاء - 7 حلقات", rating: "8.6", poster: "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=300" },
+            { title: "Mare of Easttown", desc: "تحقيق وغموض - 7 حلقات", rating: "8.4", poster: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=300" }
+        ];
+
+        const moviesData = [
+            { title: "Interstellar", desc: "رحلة عبر الثقوب الدودية والفضاء", rating: "8.7", poster: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300" },
+            { title: "Inception", desc: "عالم الأحلام المتاهية والإثارة", rating: "8.8", poster: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=300" },
+            { title: "Gran Turismo", desc: "سرعة وأكشن في عالم السيارات", rating: "7.2", poster: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=300" }
+        ];
+
+        function handleFormSubmit(event) {
+            if (event) event.preventDefault();
+            const inputField = document.getElementById('ai-user-input');
+            const message = inputField.value.trim();
+            
+            if (!message) return;
+
+            appendUserMsg(message);
+            inputField.value = '';
+
+            setTimeout(() => {
+                let itemsList = moviesData;
+                let heading = "إليك قائمة الأفلام المقترحة بطلبك:";
+
+                if (message.includes('مسلسل') || message.includes('قصيرة')) {
+                    itemsList = seriesData;
+                    heading = "إليك أفضل قائمة مسلسلات قصيرة جاهزة للبث المباشر:";
+                }
+
+                let responseHTML = `<p style="margin: 0; font-weight: bold; color: #d4af37;">${heading}</p><div class="cards-grid">`;
+
+                itemsList.forEach(item => {
+                    responseHTML += `
+                        <div class="media-card">
+                            <img src="${item.poster}" alt="${item.title}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 8px; margin-bottom: 0.5rem;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <h4 style="margin: 0; color: #fff; font-size: 0.95rem;">${item.title}</h4>
+                                    <span style="color: #d4af37; font-size: 0.8rem; font-weight: bold;"><i class="fa-solid fa-star"></i> ${item.rating}</span>
+                                </div>
+                                <p style="color: #aaa; font-size: 0.78rem; margin: 0.4rem 0 0 0;">${item.desc}</p>
+                            </div>
+                            <a href="watch.html?title=${encodeURIComponent(item.title)}" class="stream-btn">
+                                <i class="fa-solid fa-play"></i> ابدأ البث الآن
+                            </a>
+                        </div>
+                    `;
+                });
+
+                responseHTML += `</div>`;
+                appendAIMsg(responseHTML);
+            }, 500);
+        }
+
+        function sendQuickPrompt(promptText) {
+            const inputField = document.getElementById('ai-user-input');
+            if (inputField) {
+                inputField.value = promptText;
+                handleFormSubmit(null);
+            }
+        }
+
+        function appendUserMsg(msg) {
+            const chatBox = document.getElementById('chat-messages');
+            const html = `
+                <div style="display: flex; gap: 0.8rem; align-items: flex-start; justify-content: flex-end;">
+                    <div style="background: #d4af37; color: #000; padding: 0.8rem 1.2rem; border-radius: 12px; border-top-left-radius: 0; max-width: 80%; font-size: 0.95rem; font-weight: 600;">
+                        ${msg}
+                    </div>
+                </div>
+            `;
+            chatBox.insertAdjacentHTML('beforeend', html);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function appendAIMsg(msg) {
+            const chatBox = document.getElementById('chat-messages');
+            const html = `
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: #d4af37; display: flex; align-items: center; justify-content: center; color: #000; font-size: 1.1rem; flex-shrink: 0;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1rem 1.2rem; border-radius: 12px; border-top-right-radius: 0; max-width: 90%; color: #fff; line-height: 1.6; font-size: 0.95rem; width: 100%;">
+                        ${msg}
+                    </div>
+                </div>
+            `;
+            chatBox.insertAdjacentHTML('beforeend', html);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>

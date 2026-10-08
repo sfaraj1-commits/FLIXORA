@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLIXORA — تسجيل الدخول</title>
+    
+    <!-- CSS References -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; background: radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.08) 0%, rgba(6, 6, 8, 0.98) 80%), url('https://images.unsplash.com/photo-1574267432553-4b4628081c31?q=80&w=1920') no-repeat center center/cover;">
+
+    <!-- Background Dark Backdrop Layer -->
+    <div style="position: absolute; inset: 0; background: rgba(6, 6, 8, 0.85); backdrop-filter: blur(8px);"></div>
+
+    <!-- Header Logo -->
+    <a href="home.html" class="logo" style="position: absolute; top: 2rem; right: 3rem; z-index: 10; text-decoration: none; color: #fff; font-size: 1.5rem; font-weight: bold;">
+        <i class="fa-solid fa-film" style="color: var(--gold, #d4af37); margin-left: 8px;"></i> FLIXORA<span style="color: var(--gold, #d4af37);">.</span>
+    </a>
+
+    <!-- Auth Form Card -->
+    <div class="fade-in-up" style="position: relative; z-index: 5; width: 100%; max-width: 440px; background: rgba(18, 20, 26, 0.85); border: 1px solid rgba(212, 175, 55, 0.3); backdrop-filter: blur(25px); border-radius: 16px; padding: 3rem 2.5rem; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9);">
+        
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h2 style="font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">مرحباً بعودتك 👋</h2>
+            <p style="color: #aaa; font-size: 0.95rem;">سجّل دخولك لاستكمال رحلتك السينمائية</p>
+        </div>
+
+        <form id="loginForm" style="display: flex; flex-direction: column; gap: 1.25rem;">
+            
+            <!-- Email Input -->
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label style="color: #ccc; font-size: 0.85rem; font-weight: 600;">البريد الإلكتروني</label>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <i class="fa-regular fa-envelope" style="position: absolute; right: 1.2rem; color: #d4af37;"></i>
+                    <input type="email" id="email" placeholder="susan@flixora.com" required style="width: 100%; padding: 0.85rem 3rem 0.85rem 1rem; background: rgba(6, 6, 8, 0.6); border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 0.95rem;">
+                </div>
+            </div>
+
+            <!-- Password Input -->
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label style="color: #ccc; font-size: 0.85rem; font-weight: 600;">كلمة المرور</label>
+                    <a href="#" style="color: #d4af37; font-size: 0.8rem; text-decoration: none;">نسيت كلمة المرور؟</a>
+                </div>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <i class="fa-solid fa-lock" style="position: absolute; right: 1.2rem; color: #d4af37;"></i>
+                    <input type="password" id="password" placeholder="••••••••" required style="width: 100%; padding: 0.85rem 3rem 0.85rem 1rem; background: rgba(6, 6, 8, 0.6); border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 0.95rem;">
+                </div>
+            </div>
+
+            <!-- Remember Me -->
+            <div style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer;">
+                <input type="checkbox" id="remember" checked style="accent-color: #d4af37; width: 16px; height: 16px; cursor: pointer;">
+                <label for="remember" style="color: #ccc; font-size: 0.88rem; cursor: pointer;">تذكر بياناتي في هذا الجهاز</label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" style="padding: 1rem; font-size: 1rem; width: 100%; margin-top: 0.5rem; border-radius: 8px; cursor: pointer; background: #d4af37; color: #000; font-weight: bold; border: none;">
+                دخول المنصة <i class="fa-solid fa-arrow-left"></i>
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 2rem; border-top: 1px solid #222; padding-top: 1.5rem; font-size: 0.9rem; color: #aaa;">
+            ليس لديك حساب بعد؟ <a href="register.html" style="color: #d4af37; font-weight: 700; text-decoration: none;">أنشئ حسابك الجديد</a>
+        </div>
+    </div>
+
+    <!-- Script المعالج للتسجيل المباشر -->
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value || 'susan@flixora.com';
+            const userName = email.split('@')[0] || 'سوزان';
+            const userAvatar = 'https://i.pravatar.cc/100?img=33';
+
+            // Set all required auth flags to prevent redirects
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('loggedIn', 'true');
+            localStorage.setItem('flixora_token', 'demo_active_token_123');
+            localStorage.setItem('flixora_current_user', userName);
+            localStorage.setItem('flixora_current_avatar', userAvatar);
+            
+            localStorage.setItem('flixora_user', JSON.stringify({
+                name: userName,
+                email: email,
+                avatar: userAvatar,
+                isLoggedIn: true
+            }));
+
+            // Redirect directly to browse or home
+            window.location.href = 'browse.html';
+        });
+    </script>
+</body>
+</html>

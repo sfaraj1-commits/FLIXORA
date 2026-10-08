@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLIXORA — قائمتي المفضلة</title>
+    
+    <!-- CSS References -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="padding-top: 80px; background: #060608; min-height: 100vh; display: flex; flex-direction: column;">
+
+    <!-- Header Navigation -->
+    <nav class="navbar">
+        <div style="display: flex; align-items: center; gap: 3rem;">
+            <a href="home.html" class="logo" style="text-decoration: none;">
+                <i class="fa-solid fa-film" style="color: var(--gold);"></i> FLIXORA<span>.</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="home.html"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
+                <li><a href="browse.html"><i class="fa-solid fa-compass"></i> استكشف</a></li>
+                <li><a href="trending.html"><i class="fa-solid fa-fire"></i> الأحدث</a></li>
+                <li><a href="ai-assistant.html"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Assistant</a></li>
+                <li><a href="watch-party.html"><i class="fa-solid fa-users"></i> Watch Party</a></li>
+                <li><a href="my-list.html" class="active"><i class="fa-solid fa-bookmark" style="color: var(--gold);"></i> قائمتي</a></li>
+            </ul>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <a href="profile.html" style="display: flex; align-items: center; gap: 0.8rem; text-decoration: none;">
+                <img src="https://i.pravatar.cc/100?img=33" alt="Susan Profile" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--gold);">
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Section -->
+    <main style="flex: 1; padding: 2rem 4rem; max-width: 1400px; margin: 0 auto; width: 100%;">
+        
+        <!-- Header Info & Controls Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <span class="badge-gold" style="margin-bottom: 0.5rem; display: inline-block;">
+                    <i class="fa-solid fa-bookmark"></i> المكتبة الشخصية
+                </span>
+                <h1 style="font-size: 2.2rem; font-weight: 800; color: #fff; margin: 0;">قائمتي المحفوظة</h1>
+            </div>
+
+            <!-- Filters & Sorting -->
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <div style="display: flex; background: rgba(18, 20, 26, 0.8); border: 1px solid var(--border-light); border-radius: var(--radius-full); padding: 0.3rem;">
+                    <button class="list-filter-btn active" onclick="filterMyList('all', this)">الكل</button>
+                    <button class="list-filter-btn" onclick="filterMyList('movie', this)">الأفلام</button>
+                    <button class="list-filter-btn" onclick="filterMyList('series', this)">المسلسلات</button>
+                </div>
+
+                <button class="btn btn-glass" onclick="clearMyList()" style="color: #ff4757; border-color: rgba(255, 71, 87, 0.3); padding: 0.6rem 1.2rem; font-size: 0.85rem; border-radius: var(--radius-full);">
+                    <i class="fa-solid fa-trash-can"></i> مسح القائمة
+                </button>
+            </div>
+        </div>
+
+        <!-- Grid Cards Container -->
+        <div id="my-list-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 2rem;">
+            <!-- Content will be dynamically populated via JS -->
+        </div>
+
+        <!-- Empty State View -->
+        <div id="empty-list-view" style="display: none; text-align: center; padding: 5rem 1rem;">
+            <i class="fa-solid fa-bookmark" style="font-size: 4rem; color: var(--border-light); margin-bottom: 1rem; display: block;"></i>
+            <h3 style="color: #fff; font-size: 1.5rem; margin-bottom: 0.5rem;">قائمتك فارغة حالياً</h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;">لم تقم بإضافة أي أفلام أو مسلسلات إلى قائمة المشاهدة لاحقاً بعد.</p>
+            <a href="browse.html" class="btn btn-gold" style="padding: 0.8rem 2rem; border-radius: var(--radius-full);">
+                <i class="fa-solid fa-compass"></i> تصفح المكتبة الآن
+            </a>
+        </div>
+
+    </main>
+
+    <style>
+        .list-filter-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            padding: 0.4rem 1.2rem;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .list-filter-btn.active {
+            background: var(--gold);
+            color: #000;
+            font-weight: 700;
+        }
+        .movie-card-remove-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 71, 87, 0.5);
+            color: #ff4757;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            opacity: 0;
+            z-index: 5;
+        }
+        .movie-card-item:hover .movie-card-remove-btn {
+            opacity: 1;
+        }
+        .movie-card-remove-btn:hover {
+            background: #ff4757;
+            color: #fff;
+        }
+    </style>
+
+    <!-- JS References -->
+    <script src="../js/movies.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/my-list.js"></script>
+</body>
+</html>

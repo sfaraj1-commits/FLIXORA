@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLIXORA — من يشاهد الآن؟</title>
+    
+    <!-- CSS References -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Enhanced Profile Styles -->
+    <style>
+        .profile-card-item {
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .profile-avatar-wrapper {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            padding: 4px;
+            border: 2px solid transparent;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box;
+        }
+        .profile-avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .profile-card-item:hover .profile-avatar-wrapper {
+            transform: scale(1.08);
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        .primary-glow {
+            border-color: var(--gold) !important;
+            box-shadow: 0 0 25px var(--gold-glow);
+        }
+        .badge-role {
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gold);
+            color: #000;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 0.15rem 0.6rem;
+            border-radius: var(--radius-full);
+            white-space: nowrap;
+        }
+        .kids-bg {
+            background: linear-gradient(135deg, #ff007f, #7928ca);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .kids-bg i {
+            font-size: 3.5rem;
+            color: #fff;
+        }
+        .add-btn-wrapper {
+            border: 2px dashed var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.02);
+        }
+        .add-btn-wrapper i {
+            font-size: 2.2rem;
+            color: var(--text-secondary);
+        }
+        .profile-card-item:hover .add-btn-wrapper {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.05);
+        }
+        .profile-info h3 {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin: 0.8rem 0 0.2rem 0;
+            transition: color 0.3s ease;
+        }
+        .profile-card-item:hover .profile-info h3 {
+            color: #fff;
+        }
+        .profile-desc {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.08) 0%, rgba(6, 6, 8, 1) 85%); padding: 2rem; margin: 0;">
+
+    <!-- Top Navigation Header -->
+    <div style="position: absolute; top: 2.5rem; width: 100%; padding: 0 4rem; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;">
+        <div class="logo">
+            <i class="fa-solid fa-film" style="color: var(--gold); margin-left: 8px;"></i> FLIXORA<span>.</span>
+        </div>
+        <button onclick="logoutUser()" class="btn btn-secondary" style="border-radius: var(--radius-full); padding: 0.5rem 1.2rem; font-size: 0.85rem; text-decoration: none; cursor: pointer;">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> خروج
+        </button>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="fade-in-up" style="text-align: center; max-width: 950px; width: 100%; z-index: 2;">
+        
+        <span class="badge-gold floating" style="margin-bottom: 1.2rem; display: inline-block;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> مرحباً بك مجدداً
+        </span>
+        <h1 style="font-size: 2.8rem; font-weight: 800; margin-bottom: 0.5rem; color: #fff;">من يُشاهد الآن؟</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 3.5rem; font-size: 1.05rem;">اختر ملفك الشخصي للدخول للتوصيات الذكية المخصصة</p>
+
+        <!-- Profiles Cards Grid -->
+        <div id="profiles-grid" style="display: flex; gap: 2.5rem; justify-content: center; align-items: center; flex-wrap: wrap;">
+            
+            <!-- Default Static Profiles (تُحدث تلقائياً بالبيانات القادمة من الباك إند) -->
+            <div class="profile-card-item" onclick="selectProfile('سوزان', 'https://i.pravatar.cc/150?img=33')">
+                <div class="profile-avatar-wrapper primary-glow">
+                    <img src="https://i.pravatar.cc/150?img=33" alt="Susan Profile">
+                    <span class="badge-role">Explorer 🎬</span>
+                </div>
+                <div class="profile-info">
+                    <h3>سوزان (Susan)</h3>
+                    <span class="profile-desc">Level 27 • Sci-Fi Lover</span>
+                </div>
+            </div>
+
+            <div class="profile-card-item" onclick="selectKidsProfile()">
+                <div class="profile-avatar-wrapper kids-bg">
+                    <i class="fa-solid fa-child-reaching"></i>
+                </div>
+                <div class="profile-info">
+                    <h3>أطفال (Kids)</h3>
+                    <span class="profile-desc">Family & Animation</span>
+                </div>
+            </div>
+
+            <!-- Profile Add Button -->
+            <div class="profile-card-item" onclick="openAddProfileModal()">
+                <div class="profile-avatar-wrapper add-btn-wrapper">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+                <div class="profile-info">
+                    <h3 style="color: var(--text-muted);">إضافة بروفايل</h3>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Manage Profiles Button -->
+        <div style="margin-top: 4rem;">
+            <a href="profile.html" class="btn btn-secondary" style="padding: 0.8rem 2.2rem; border-radius: var(--radius-sm); font-size: 0.95rem; text-decoration: none;">
+                <i class="fa-solid fa-pen"></i> إدارة الملفات الشخصية
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Modal Form: Add New Profile -->
+    <div id="add-profile-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 100; align-items: center; justify-content: center;">
+        <div style="background: rgba(18, 20, 26, 0.95); border: 1px solid var(--border-gold); border-radius: var(--radius-lg); padding: 2.5rem; width: 100%; max-width: 420px; text-align: right;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="margin: 0; color: #fff; font-size: 1.3rem;">إنشاء ملف شخصي جديد</h3>
+                <button onclick="closeAddProfileModal()" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+
+            <form id="create-profile-form" style="display: flex; flex-direction: column; gap: 1.2rem;">
+                <div>
+                    <label style="color: var(--text-secondary); font-size: 0.85rem; display: block; margin-bottom: 0.5rem;">اسم الملف الشخصي</label>
+                    <input type="text" id="new-profile-name" placeholder="أدخل الاسم..." required style="width: 100%; padding: 0.8rem; background: rgba(6,6,8,0.8); border: 1px solid var(--border-light); border-radius: var(--radius-sm); color: #fff; box-sizing: border-box;">
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 0.8rem; cursor: pointer;">
+                    <input type="checkbox" id="is-kids-check" style="accent-color: var(--gold); width: 18px; height: 18px;">
+                    <label for="is-kids-check" style="color: #fff; font-size: 0.9rem; cursor: pointer;">تفعيل نمط الأطفال (محتوى آمن 100%)</label>
+                </div>
+
+                <button type="button" onclick="createNewProfile()" class="btn btn-gold" style="padding: 0.8rem; border-radius: var(--radius-sm); margin-top: 0.5rem; width: 100%;">حفظ الدخول</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JS Handling Script & Backend Integration -->
+    <script src="../js/main.js"></script>
+    <script>
+        // 1. جلب البروفايلات من الباك إند
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await apiFetch('/profiles');
+                if (res.ok) {
+                    const profiles = await res.json();
+                    console.log('Profiles loaded:', profiles);
+                } else if (res.status === 401) {
+                    window.location.href = 'login.html';
+                }
+            } catch (err) {
+                console.error('Error fetching profiles:', err);
+            }
+        });
+
+        // 2. اختيار البروفايل والدخول
+        function selectProfile(name, avatar) {
+            localStorage.setItem('flixora_current_user', name);
+            localStorage.setItem('flixora_current_avatar', avatar);
+            window.location.href = 'home.html';
+        }
+
+        function selectKidsProfile() {
+            localStorage.setItem('flixora_current_user', 'أطفال');
+            localStorage.setItem('flixora_mode', 'kids');
+            window.location.href = 'home.html';
+        }
+
+        // 3. التحكم بالنافذة المنبثقة
+        function openAddProfileModal() {
+            document.getElementById('add-profile-modal').style.display = 'flex';
+        }
+
+        function closeAddProfileModal() {
+            document.getElementById('add-profile-modal').style.display = 'none';
+        }
+
+        // 4. إنشاء بروفايل جديد عبر Laravel API
+        async function createNewProfile() {
+            const nameInput = document.getElementById('new-profile-name').value;
+            const isKids = document.getElementById('is-kids-check').checked;
+
+            if (!nameInput) {
+                alert('يرجى إدخال اسم البروفايل');
+                return;
+            }
+
+            try {
+                const response = await apiFetch('/profiles', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name: nameInput,
+                        is_kid: isKids,
+                        avatar: 'https://i.pravatar.cc/150?img=60'
+                    })
+                });
+
+                if (response.ok) {
+                    const newProfile = await response.json();
+                    closeAddProfileModal();
+                    selectProfile(newProfile.name, newProfile.avatar || 'https://i.pravatar.cc/150?img=60');
+                } else {
+                    alert('فشل حفظ البروفايل');
+                }
+            } catch (error) {
+                console.error('Error creating profile:', error);
+            }
+        }
+
+        // 5. تسجيل الخروج
+        async function logoutUser() {
+            try {
+                await apiFetch('/logout', { method: 'POST' });
+            } catch (e) {
+                console.log(e);
+            }
+            localStorage.removeItem('flixora_token');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

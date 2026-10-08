@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLIXORA — إنشاء حساب جديد</title>
+    
+    <!-- CSS References -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body style="min-height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; background: radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.08) 0%, rgba(6, 6, 8, 0.98) 80%), url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=1920') no-repeat center center/cover; padding: 2rem 0;">
+
+    <div style="position: absolute; inset: 0; background: rgba(6, 6, 8, 0.88); backdrop-filter: blur(10px);"></div>
+
+    <!-- Header Logo -->
+    <a href="index.html" class="logo" style="position: absolute; top: 2rem; right: 3rem; z-index: 10; text-decoration: none;">
+        <i class="fa-solid fa-film" style="color: var(--gold); margin-left: 8px;"></i> FLIXORA<span>.</span>
+    </a>
+
+    <!-- Auth Card -->
+    <div class="fade-in-up" style="position: relative; z-index: 5; width: 100%; max-width: 480px; background: rgba(18, 20, 26, 0.78); border: 1px solid var(--border-gold); backdrop-filter: blur(25px); border-radius: var(--radius-lg); padding: 3rem 2.5rem; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9), 0 0 30px var(--gold-glow);">
+        
+        <div style="text-align: center; margin-bottom: 1.8rem;">
+            <span class="badge-gold" style="margin-bottom: 0.6rem;"><i class="fa-solid fa-crown"></i> انضم إلى نخبة عشاق السينما</span>
+            <h2 style="font-size: 2rem; font-weight: 800; color: #fff; margin-top: 0.4rem;">إنشاء حساب جديد</h2>
+        </div>
+
+        <form action="profiles.html" method="GET" style="display: flex; flex-direction: column; gap: 1.1rem;">
+            
+            <!-- Full Name Input -->
+            <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                <label style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600;">الاسم الكامل</label>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <i class="fa-regular fa-user" style="position: absolute; right: 1.2rem; color: var(--gold);"></i>
+                    <input type="text" placeholder="سوزان أحمد" required style="width: 100%; padding: 0.85rem 3rem 0.85rem 1rem; background: rgba(6, 6, 8, 0.6); border: 1px solid var(--border-light); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem;" onfocus="this.style.borderColor='var(--gold)';" onblur="this.style.borderColor='var(--border-light)';">
+                </div>
+            </div>
+
+            <!-- Email Input -->
+            <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                <label style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600;">البريد الإلكتروني</label>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <i class="fa-regular fa-envelope" style="position: absolute; right: 1.2rem; color: var(--gold);"></i>
+                    <input type="email" placeholder="susan@example.com" required style="width: 100%; padding: 0.85rem 3rem 0.85rem 1rem; background: rgba(6, 6, 8, 0.6); border: 1px solid var(--border-light); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem;" onfocus="this.style.borderColor='var(--gold)';" onblur="this.style.borderColor='var(--border-light)';">
+                </div>
+            </div>
+
+            <!-- Password Input -->
+            <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                <label style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600;">كلمة المرور</label>
+                <div style="position: relative; display: flex; align-items: center;">
+                    <i class="fa-solid fa-lock" style="position: absolute; right: 1.2rem; color: var(--gold);"></i>
+                    <input type="password" placeholder="••••••••" required style="width: 100%; padding: 0.85rem 3rem 0.85rem 1rem; background: rgba(6, 6, 8, 0.6); border: 1px solid var(--border-light); border-radius: var(--radius-sm); color: #fff; font-size: 0.95rem;" onfocus="this.style.borderColor='var(--gold)';" onblur="this.style.borderColor='var(--border-light)';">
+                </div>
+            </div>
+
+            <!-- Terms Confirmation -->
+            <div style="display: flex; align-items: flex-start; gap: 0.6rem; margin-top: 0.2rem;">
+                <input type="checkbox" id="terms" required style="accent-color: var(--gold); width: 16px; height: 16px; margin-top: 3px; cursor: pointer;">
+                <label for="terms" style="color: var(--text-secondary); font-size: 0.82rem; line-height: 1.4; cursor: pointer;">
+                    أوافق على <a href="#" style="color: var(--gold);">شروط الاستخدام</a> و <a href="#" style="color: var(--gold);">سياسة الخصوصية</a> الخاصة بـ FLIXORA.
+                </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-gold" style="padding: 1rem; font-size: 1rem; width: 100%; margin-top: 0.5rem; border-radius: var(--radius-sm);">
+                إنشاء الحساب للانتقال للملفات الشخصية <i class="fa-solid fa-arrow-left"></i>
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.8rem; border-top: 1px solid var(--border); padding-top: 1.2rem; font-size: 0.9rem; color: var(--text-secondary);">
+            لديك حساب بالفعل؟ <a href="login.html" style="color: var(--gold); font-weight: 700; text-decoration: none;">سجل دخولك هنا</a>
+        </div>
+    </div>
+
+    <script src="../js/movies.js"></script>
+    <script src="../js/main.js"></script>
+</body>
+</html>

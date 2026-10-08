@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLIXORA — الأحدث والرائج</title>
+    
+    <!-- تثبيت جلسة المستخدم لمنع إعادة التوجيه أو الشاشة البيضاء -->
+    <script>
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('loggedIn', 'true');
+        localStorage.setItem('flixora_token', 'demo_active_token_123');
+    </script>
+
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #060608;
+            color: #ffffff;
+            font-family: system-ui, -apple-system, sans-serif;
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(6, 6, 8, 0.9);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 2rem;
+        }
+        .logo {
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .logo span { color: #d4af37; }
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+            list-style: none;
+        }
+        .nav-links a {
+            color: #aaa;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        .nav-links a.active, .nav-links a:hover {
+            color: #d4af37;
+        }
+
+        /* Main Section */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1rem;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .section-title i { color: #d4af37; }
+
+        /* Grid System */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+        .card {
+            background: #12141a;
+            border: 1px solid #222;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s, border-color 0.3s;
+            position: relative;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: #d4af37;
+        }
+        .card-img-wrap {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+        .card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.75);
+            color: #d4af37;
+            border: 1px solid #d4af37;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .card-body {
+            padding: 1rem;
+        }
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: bold;
+            margin-bottom: 0.4rem;
+            color: #fff;
+        }
+        .card-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            color: #aaa;
+            margin-bottom: 0.8rem;
+        }
+        .watch-btn {
+            display: block;
+            text-align: center;
+            background: #d4af37;
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 0.6rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+        .watch-btn:hover {
+            background: #f3c63f;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <a href="home.html" class="logo">
+            <i class="fa-solid fa-film" style="color: #d4af37;"></i> FLIXORA<span>.</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="home.html"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
+            <li><a href="browse.html"><i class="fa-solid fa-compass"></i> استكشف</a></li>
+            <li><a href="trending.html" class="active"><i class="fa-solid fa-fire"></i> الأحدث</a></li>
+            <li><a href="ai-assistant.html"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Assistant</a></li>
+            <li><a href="watch-party.html"><i class="fa-solid fa-users"></i> Watch Party</a></li>
+            <li><a href="my-list.html"><i class="fa-solid fa-bookmark"></i> قائمتي</a></li>
+        </ul>
+        <div>
+            <a href="profile.html">
+                <img id="nav-profile-avatar" src="https://i.pravatar.cc/100?img=33" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover;">
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="section-header">
+            <h1 class="section-title">
+                <i class="fa-solid fa-fire"></i> الأحدث والتريند هذا الأسبوع
+            </h1>
+            <span style="color: #aaa; font-size: 0.9rem;">تحديث يومي لأكثر الأعمال مشاهدة</span>
+        </div>
+
+        <div class="grid" id="trending-grid">
+            <!-- Cards generated dynamically -->
+        </div>
+    </main>
+
+    <script>
+        // Trending Items Data
+        const trendingItems = [
+            { id: 'dune-2', title: 'Dune: Part Two', category: 'فيلم سينمائي', rating: '8.6', year: '2024', poster: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400' },
+            { id: 'oppenheimer', title: 'Oppenheimer', category: 'فيلم سينمائي', rating: '8.9', year: '2023', poster: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400' },
+            { id: 'chernobyl', title: 'Chernobyl', category: 'مسلسل قصير', rating: '9.4', year: '2019', poster: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400' },
+            { id: 'interstellar', title: 'Interstellar', category: 'خيال علمي', rating: '8.7', year: '2014', poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=400' },
+            { id: 'the-batman', title: 'The Batman', category: 'أكشن وغموض', rating: '7.8', year: '2022', poster: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=400' },
+            { id: 'queens-gambit', title: 'The Queen\'s Gambit', category: 'مسلسل قصير', rating: '8.6', year: '2020', poster: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=400' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('trending-grid');
+            let html = '';
+
+            trendingItems.forEach(item => {
+                html += `
+                    <div class="card">
+                        <div class="card-img-wrap">
+                            <span class="badge">TOP 🔥</span>
+                            <img src="${item.poster}" alt="${item.title}">
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">${item.title}</h3>
+                            <div class="card-info">
+                                <span>${item.category} • ${item.year}</span>
+                                <span style="color: #d4af37;"><i class="fa-solid fa-star"></i> ${item.rating}</span>
+                            </div>
+                            <a href="watch.html?id=${item.id}&title=${encodeURIComponent(item.title)}" class="watch-btn">
+                                <i class="fa-solid fa-play"></i> مشاهدة الآن
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        });
+    </script>
+</body>
+</html>

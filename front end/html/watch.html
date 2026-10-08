@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLIXORA — مشغل الفيديو السينمائي</title>
+    
+    <!-- CSS References -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    
+    <!-- FontAwesome Pro Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Styles & Ambient Effects -->
+    <style>
+        :root {
+            --gold: #d4af37;
+            --border: rgba(255, 255, 255, 0.1);
+            --border-gold: rgba(212, 175, 55, 0.3);
+            --radius-md: 12px;
+            --radius-full: 999px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --text-secondary: #a0a0a0;
+        }
+
+        body {
+            background: #000;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            user-select: none;
+        }
+
+        /* Ambient Light Glow */
+        .video-container::before {
+            content: '';
+            position: absolute;
+            inset: -20px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+            filter: blur(35px);
+            z-index: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Popover Menus */
+        .player-popover {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: rgba(18, 20, 26, 0.95);
+            border: 1px solid var(--border-gold);
+            backdrop-filter: blur(20px);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            width: 230px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            z-index: 30;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .player-popover.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .player-popover label {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #fff;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            padding: 0.3rem 0.5rem;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+
+        .player-popover label:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .player-popover input[type="radio"] {
+            accent-color: var(--gold);
+            cursor: pointer;
+        }
+
+        /* Controls Auto-hide behavior */
+        .hide-controls {
+            opacity: 0 !important;
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbar for Popovers & Drawer */
+        .player-popover::-webkit-scrollbar, #movie-info-drawer::-webkit-scrollbar {
+            width: 4px;
+        }
+        .player-popover::-webkit-scrollbar-thumb, #movie-info-drawer::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Video Player Container with Ambient Glow -->
+    <div id="player-container" class="video-container" style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000;">
+        
+        <!-- Video Element -->
+        <video id="main-player" style="width: 100%; height: 100%; object-fit: contain;" poster="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1920">
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" type="video/mp4">
+            متصفحك لا يدعم تشغيل هذا الفيديو.
+        </video>
+
+        <!-- Toast Notification (الإشعارات المرئية للتحكم) -->
+        <div id="player-toast" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8); background: rgba(0, 0, 0, 0.75); border: 1px solid var(--border-gold); color: #fff; padding: 1rem 2rem; border-radius: var(--radius-full); font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 0.8rem; backdrop-filter: blur(15px); pointer-events: none; opacity: 0; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 20;">
+            <i id="toast-icon" class="fa-solid fa-play" style="color: var(--gold);"></i>
+            <span id="toast-text">تشغيل</span>
+        </div>
+
+        <!-- Dynamic Skip Intro Button -->
+        <button id="skip-intro-btn" onclick="skipIntro()" style="display: none; position: absolute; bottom: 100px; left: 35px; z-index: 25; background: rgba(18, 20, 26, 0.85); color: #fff; border: 1px solid var(--gold); padding: 0.6rem 1.4rem; border-radius: var(--radius-full); cursor: pointer; font-weight: 700; font-size: 0.85rem; align-items: center; gap: 0.5rem; backdrop-filter: blur(10px); transition: var(--transition); box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+            <i class="fa-solid fa-forward-step" style="color: var(--gold);"></i> تخطي المقدمة
+        </button>
+
+        <!-- Side Info & Recommendations Drawer (لوحة المعلومات الجانبية) -->
+        <div id="movie-info-drawer" style="position: absolute; top: 0; left: 0; bottom: 0; width: 380px; background: rgba(12, 14, 18, 0.95); border-right: 1px solid var(--border-gold); backdrop-filter: blur(25px); z-index: 28; transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 1.5rem; overflow-y: auto;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+                <h3 style="color: #fff; margin: 0; font-size: 1.1rem; font-weight: 700;">تفاصيل العرض</h3>
+                <button onclick="toggleInfoDrawer()" style="background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div>
+                <h4 style="color: var(--gold); font-size: 0.85rem; margin: 0 0 0.5rem 0; text-transform: uppercase;">القصة</h4>
+                <p id="drawer-synopsis" style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.6; margin: 0;">
+                    فريق من المستكشبين يسافر عبر ثقب دودي في الفضاء في محاولة لضمان بقاء البشرية.
+                </p>
+            </div>
+
+            <div>
+                <h4 style="color: var(--gold); font-size: 0.85rem; margin: 0 0 0.5rem 0; text-transform: uppercase;">طاقم العمل</h4>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <span style="background: rgba(255,255,255,0.08); color: #fff; padding: 0.3rem 0.8rem; border-radius: var(--radius-full); font-size: 0.75rem;">ماثيو ماكونهي</span>
+                    <span style="background: rgba(255,255,255,0.08); color: #fff; padding: 0.3rem 0.8rem; border-radius: var(--radius-full); font-size: 0.75rem;">آن هاثاواي</span>
+                    <span style="background: rgba(255,255,255,0.08); color: #fff; padding: 0.3rem 0.8rem; border-radius: var(--radius-full); font-size: 0.75rem;">كريستوفر نولان (مخرج)</span>
+                </div>
+            </div>
+
+            <div>
+                <h4 style="color: var(--gold); font-size: 0.85rem; margin: 0 0 0.8rem 0; text-transform: uppercase;">عروض قد تعجبك</h4>
+                <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                    <a href="watch.html?id=101" style="display: flex; gap: 0.8rem; align-items: center; text-decoration: none; background: rgba(255,255,255,0.03); padding: 0.5rem; border-radius: var(--radius-md); transition: var(--transition);" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
+                        <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=200" style="width: 70px; height: 45px; object-fit: cover; border-radius: 6px;" alt="Chernobyl">
+                        <div>
+                            <h5 style="color: #fff; margin: 0 0 0.2rem 0; font-size: 0.85rem;">Chernobyl</h5>
+                            <span style="color: var(--text-secondary); font-size: 0.75rem;">9.5 ★ • مسلسل قصير</span>
+                        </div>
+                    </a>
+
+                    <a href="watch.html?id=102" style="display: flex; gap: 0.8rem; align-items: center; text-decoration: none; background: rgba(255,255,255,0.03); padding: 0.5rem; border-radius: var(--radius-md); transition: var(--transition);" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
+                        <img src="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=200" style="width: 70px; height: 45px; object-fit: cover; border-radius: 6px;" alt="Mad Max">
+                        <div>
+                            <h5 style="color: #fff; margin: 0 0 0.2rem 0; font-size: 0.85rem;">Mad Max: Fury Road</h5>
+                            <span style="color: var(--text-secondary); font-size: 0.75rem;">8.1 ★ • أكشن / مغامرة</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Header Overlay -->
+        <div id="player-header" style="position: absolute; top: 0; right: 0; left: 0; padding: 1.5rem 2.5rem; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, transparent 100%); z-index: 10; transition: opacity 0.3s ease;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <a href="javascript:history.back()" style="color: #fff; font-size: 1.2rem; text-decoration: none; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); border-radius: 50%; backdrop-filter: blur(5px); transition: var(--transition);">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+                <div>
+                    <h2 id="video-title" style="color: #fff; font-size: 1.2rem; font-weight: 700; margin: 0;">جاري التحميل...</h2>
+                    <span id="video-subtitle" style="color: var(--gold); font-size: 0.85rem;">4K ULTRA HD • Dolby Atmos</span>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <!-- زر فتح لوحة التفاصيل -->
+                <button onclick="toggleInfoDrawer()" style="padding: 0.6rem 1.2rem; font-size: 0.85rem; border-radius: var(--radius-full); background: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--border); backdrop-filter: blur(10px); cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: var(--transition);">
+                    <i class="fa-solid fa-circle-info" style="color: var(--gold);"></i> التفاصيل
+                </button>
+                <button id="btn-watch-party" class="btn" style="padding: 0.6rem 1.4rem; font-size: 0.85rem; border-radius: var(--radius-full); background: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--border); backdrop-filter: blur(10px); cursor: pointer; display: flex; align-items: center; gap: 0.5rem; transition: var(--transition);">
+                    <i class="fa-solid fa-users" style="color: var(--gold);"></i> Watch Party
+                </button>
+            </div>
+        </div>
+
+        <!-- Custom Controls Overlay -->
+        <div id="player-controls" style="position: absolute; bottom: 0; right: 0; left: 0; padding: 2rem 2.5rem; background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, transparent 100%); z-index: 10; transition: opacity 0.3s ease; display: flex; flex-direction: column; gap: 0.8rem;">
+            
+            <!-- Scene Markers (علامات المشاهد) -->
+            <div id="scene-markers" style="display: flex; justify-content: space-between; gap: 4px; margin-bottom: 2px;">
+                <button onclick="seekToTime(0)" style="flex: 1; height: 3px; background: rgba(255,255,255,0.3); border: none; cursor: pointer; border-radius: 2px; transition: var(--transition);" title="المقدمة (00:00)" onmouseover="this.style.background='var(--gold)'" onmouseout="this.style.background='rgba(255,255,255,0.3)'"></button>
+                <button onclick="seekToTime(85)" style="flex: 1; height: 3px; background: rgba(255,255,255,0.3); border: none; cursor: pointer; border-radius: 2px; transition: var(--transition);" title="بداية الأحداث (01:25)" onmouseover="this.style.background='var(--gold)'" onmouseout="this.style.background='rgba(255,255,255,0.3)'"></button>
+                <button onclick="seekToTime(300)" style="flex: 1; height: 3px; background: rgba(255,255,255,0.3); border: none; cursor: pointer; border-radius: 2px; transition: var(--transition);" title="ذروة العرض (05:00)" onmouseover="this.style.background='var(--gold)'" onmouseout="this.style.background='rgba(255,255,255,0.3)'"></button>
+            </div>
+
+            <!-- Progress Bar -->
+            <div style="position: relative; width: 100%; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; cursor: pointer;" id="progress-container">
+                <div id="progress-bar" style="width: 0%; height: 100%; background: var(--gold); border-radius: 3px; position: relative;">
+                    <div style="position: absolute; left: 0; top: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px var(--gold);"></div>
+                </div>
+            </div>
+
+            <!-- Control Buttons Row -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                
+                <!-- Left Side: Playback & Volume -->
+                <div style="display: flex; align-items: center; gap: 1.5rem;">
+                    <button id="btn-play" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; width: 30px;" title="تشغيل / إيقاف (Space)">
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                    <button id="btn-rewind" style="background: none; border: none; color: var(--text-secondary); font-size: 1.1rem; cursor: pointer;" title="تراجع 10 ثواني">
+                        <i class="fa-solid fa-rotate-left"></i> 10s
+                    </button>
+                    <button id="btn-forward" style="background: none; border: none; color: var(--text-secondary); font-size: 1.1rem; cursor: pointer;" title="تقديم 10 ثواني">
+                        <i class="fa-solid fa-rotate-right"></i> 10s
+                    </button>
+
+                    <!-- Volume Slider -->
+                    <div style="display: flex; align-items: center; gap: 0.6rem; margin-right: 0.5rem;">
+                        <button id="btn-volume" style="background: none; border: none; color: #fff; font-size: 1.1rem; cursor: pointer;" title="كتم / تشغيل الصوت (M)">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                        <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="1" style="width: 70px; accent-color: var(--gold); cursor: pointer;">
+                    </div>
+
+                    <!-- Time Display -->
+                    <span style="color: var(--text-secondary); font-size: 0.88rem; font-family: monospace;" id="time-display">00:00 / 00:00</span>
+                </div>
+
+                <!-- Right Side: Audio, Subtitles, Quality, PiP & Fullscreen -->
+                <div style="display: flex; align-items: center; gap: 1.2rem; position: relative;">
+                    
+                    <!-- Audio Track & Subtitles Menu Button -->
+                    <div style="position: relative;">
+                        <button class="control-menu-btn" onclick="toggleMenu('audio-menu', event)" style="background: none; border: none; color: #fff; font-size: 1.1rem; cursor: pointer;" title="الصوت واللغة">
+                            <i class="fa-solid fa-language"></i>
+                        </button>
+                        <div id="audio-menu" class="player-popover">
+                            <h4 style="color: var(--gold); font-size: 0.85rem; margin: 0 0 0.5rem 0; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem;">المسار الصوتي</h4>
+                            <label><input type="radio" name="audio" value="en" checked> الإنجليزية (Original)</label>
+                            <label><input type="radio" name="audio" value="ar"> المدبلجة للعربية</label>
+                            
+                            <h4 style="color: var(--gold); font-size: 0.85rem; margin: 0.8rem 0 0.5rem 0; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem;">الترجمة (Subtitles)</h4>
+                            <label><input type="radio" name="sub" value="ar" checked> العربية (Arabic)</label>
+                            <label><input type="radio" name="sub" value="en"> الإنجليزية (English)</label>
+                            <label><input type="radio" name="sub" value="off"> إيقاف الترجمة</label>
+                        </div>
+                    </div>
+
+                    <!-- Quality Menu Button -->
+                    <div style="position: relative;">
+                        <button class="control-menu-btn" onclick="toggleMenu('quality-menu', event)" style="background: none; border: none; color: #fff; font-size: 1.1rem; cursor: pointer;" title="جودة الفيديو">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
+                        <div id="quality-menu" class="player-popover">
+                            <h4 style="color: var(--gold); font-size: 0.85rem; margin: 0 0 0.5rem 0; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem;">جودة العرض</h4>
+                            <label><input type="radio" name="quality" value="4k" checked> 4K Ultra HD (2160p)</label>
+                            <label><input type="radio" name="quality" value="1080p"> Full HD (1080p)</label>
+                            <label><input type="radio" name="quality" value="720p"> HD (720p)</label>
+                            <label><input type="radio" name="quality" value="auto"> تلقائي (Auto)</label>
+                        </div>
+                    </div>
+
+                    <!-- Picture-in-Picture Button -->
+                    <button id="btn-pip" style="background: none; border: none; color: #fff; font-size: 1.1rem; cursor: pointer;" title="نافذة منبثقة (P)">
+                        <i class="fa-solid fa-clone"></i>
+                    </button>
+
+                    <!-- Fullscreen Toggle -->
+                    <button id="btn-fullscreen" style="background: none; border: none; color: #fff; font-size: 1.1rem; cursor: pointer;" title="ملء الشاشة (F)">
+                        <i class="fa-solid fa-expand"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- External Fallback JS Scripts -->
+    <script src="../js/movies.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/watch.js"></script>
+
+    <!-- Native JavaScript Engine -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const player = document.getElementById('main-player');
+            const btnPlay = document.getElementById('btn-play');
+            const btnRewind = document.getElementById('btn-rewind');
+            const btnForward = document.getElementById('btn-forward');
+            const btnVolume = document.getElementById('btn-volume');
+            const volumeSlider = document.getElementById('volume-slider');
+            const btnPip = document.getElementById('btn-pip');
+            const btnFullscreen = document.getElementById('btn-fullscreen');
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const timeDisplay = document.getElementById('time-display');
+            const skipIntroBtn = document.getElementById('skip-intro-btn');
+            const playerHeader = document.getElementById('player-header');
+            const playerControls = document.getElementById('player-controls');
+            const playerContainer = document.getElementById('player-container');
+            const btnWatchParty = document.getElementById('btn-watch-party');
+
+            // 1. Dynamic Video Data Injection via URL Parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const movieId = urlParams.get('id') || '1';
+
+            const movieDatabase = {
+                '1': { title: 'Interstellar (2014)', sub: '4K ULTRA HD • Dolby Atmos' },
+                '101': { title: 'Chernobyl (2019)', sub: 'FHD • Dolby Digital' },
+                '102': { title: 'Mad Max: Fury Road (2015)', sub: '4K ULTRA HD • HDR10' }
+            };
+
+            const selectedMovie = movieDatabase[movieId] || movieDatabase['1'];
+            document.getElementById('video-title').textContent = selectedMovie.title;
+            document.getElementById('video-subtitle').textContent = selectedMovie.sub;
+
+            btnWatchParty.onclick = () => {
+                window.location.href = `watch-party.html?create=${movieId}`;
+            };
+
+            // 2. Play / Pause Logic
+            function togglePlay() {
+                if (player.paused) {
+                    player.play();
+                    btnPlay.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                } else {
+                    player.pause();
+                    btnPlay.innerHTML = '<i class="fa-solid fa-play"></i>';
+                }
+            }
+
+            btnPlay.addEventListener('click', () => {
+                togglePlay();
+                showToast(player.paused ? 'إيقاف مؤقت' : 'تشغيل', player.paused ? 'fa-solid fa-pause' : 'fa-solid fa-play');
+            });
+
+            player.addEventListener('click', () => {
+                togglePlay();
+                showToast(player.paused ? 'إيقاف مؤقت' : 'تشغيل', player.paused ? 'fa-solid fa-pause' : 'fa-solid fa-play');
+            });
+
+            // 3. Time Update & Progress Bar
+            player.addEventListener('timeupdate', () => {
+                if (player.duration) {
+                    const pct = (player.currentTime / player.duration) * 100;
+                    progressBar.style.width = `${pct}%`;
+
+                    const curM = Math.floor(player.currentTime / 60);
+                    const curS = Math.floor(player.currentTime % 60);
+                    const durM = Math.floor(player.duration / 60);
+                    const durS = Math.floor(player.duration % 60);
+
+                    timeDisplay.textContent = `${String(curM).padStart(2, '0')}:${String(curS).padStart(2, '0')} / ${String(durM).padStart(2, '0')}:${String(durS).padStart(2, '0')}`;
+                }
+
+                // Show Skip Intro Button between sec 10 and sec 80
+                if (player.currentTime >= 10 && player.currentTime <= 80) {
+                    skipIntroBtn.style.display = 'flex';
+                } else {
+                    skipIntroBtn.style.display = 'none';
+                }
+            });
+
+            // 4. Seek Handler
+            progressContainer.addEventListener('click', (e) => {
+                const rect = progressContainer.getBoundingClientRect();
+                const clickPos = (e.clientX - rect.left) / rect.width;
+                player.currentTime = clickPos * player.duration;
+            });
+
+            // 5. Skip / Rewind Controls
+            btnRewind.addEventListener('click', () => {
+                player.currentTime = Math.max(0, player.currentTime - 10);
+                showToast('-10 ثواني', 'fa-solid fa-rotate-left');
+            });
+
+            btnForward.addEventListener('click', () => {
+                player.currentTime = Math.min(player.duration, player.currentTime + 10);
+                showToast('+10 ثواني', 'fa-solid fa-rotate-right');
+            });
+
+            // 6. Volume Control
+            volumeSlider.addEventListener('input', (e) => {
+                player.volume = e.target.value;
+                player.muted = e.target.value == 0;
+                updateVolumeIcon();
+            });
+
+            btnVolume.addEventListener('click', () => {
+                player.muted = !player.muted;
+                updateVolumeIcon();
+                showToast(player.muted ? 'تم الكتم' : 'تشغيل الصوت', player.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high');
+            });
+
+            function updateVolumeIcon() {
+                if (player.muted || player.volume === 0) {
+                    btnVolume.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
+                } else if (player.volume < 0.5) {
+                    btnVolume.innerHTML = '<i class="fa-solid fa-volume-low"></i>';
+                } else {
+                    btnVolume.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+                }
+            }
+
+            // 7. Picture-in-Picture Mode
+            btnPip.addEventListener('click', async () => {
+                try {
+                    if (document.pictureInPictureElement) {
+                        await document.exitPictureInPicture();
+                        showToast('إغلاق النافذة المنبثقة', 'fa-solid fa-clone');
+                    } else if (document.pictureInPictureEnabled) {
+                        await player.requestPictureInPicture();
+                        showToast('وضع النافذة المنبثقة', 'fa-solid fa-clone');
+                    }
+                } catch (error) {
+                    showToast('الوضع غير مدعوم', 'fa-solid fa-triangle-exclamation');
+                }
+            });
+
+            // 8. Fullscreen Toggle
+            btnFullscreen.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    playerContainer.requestFullscreen();
+                    btnFullscreen.innerHTML = '<i class="fa-solid fa-compress"></i>';
+                } else {
+                    document.exitFullscreen();
+                    btnFullscreen.innerHTML = '<i class="fa-solid fa-expand"></i>';
+                }
+            });
+
+            // 9. Dynamic Auto-hide Controls on Idle
+            let idleTimer;
+            function resetIdleTimer() {
+                playerHeader.classList.remove('hide-controls');
+                playerControls.classList.remove('hide-controls');
+                playerContainer.style.cursor = 'default';
+
+                clearTimeout(idleTimer);
+                if (!player.paused) {
+                    idleTimer = setTimeout(() => {
+                        playerHeader.classList.add('hide-controls');
+                        playerControls.classList.add('hide-controls');
+                        closeAllMenus();
+                        playerContainer.style.cursor = 'none';
+                    }, 3500);
+                }
+            }
+
+            playerContainer.addEventListener('mousemove', resetIdleTimer);
+            playerContainer.addEventListener('mouseleave', () => {
+                if (!player.paused) {
+                    playerHeader.classList.add('hide-controls');
+                    playerControls.classList.add('hide-controls');
+                }
+            });
+
+            // 10. Keyboard Shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    togglePlay();
+                    showToast(player.paused ? 'إيقاف مؤقت' : 'تشغيل', player.paused ? 'fa-solid fa-pause' : 'fa-solid fa-play');
+                } else if (e.code === 'KeyF') {
+                    btnFullscreen.click();
+                } else if (e.code === 'KeyP') {
+                    btnPip.click();
+                } else if (e.code === 'KeyM') {
+                    player.muted = !player.muted;
+                    updateVolumeIcon();
+                    showToast(player.muted ? 'تم الكتم' : 'تشغيل الصوت', player.muted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high');
+                } else if (e.code === 'ArrowRight') {
+                    player.currentTime += 5;
+                    showToast('+5 ثواني', 'fa-solid fa-forward');
+                } else if (e.code === 'ArrowLeft') {
+                    player.currentTime -= 5;
+                    showToast('-5 ثواني', 'fa-solid fa-backward');
+                } else if (e.code === 'ArrowUp') {
+                    e.preventDefault();
+                    player.volume = Math.min(1, player.volume + 0.1);
+                    volumeSlider.value = player.volume;
+                    showToast(`الصوت: ${Math.round(player.volume * 100)}%`, 'fa-solid fa-volume-high');
+                } else if (e.code === 'ArrowDown') {
+                    e.preventDefault();
+                    player.volume = Math.max(0, player.volume - 0.1);
+                    volumeSlider.value = player.volume;
+                    showToast(`الصوت: ${Math.round(player.volume * 100)}%`, player.volume === 0 ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-low');
+                }
+            });
+        });
+
+        // Scene Seek Function
+        function seekToTime(seconds) {
+            const player = document.getElementById('main-player');
+            player.currentTime = seconds;
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            showToast(`انتقال إلى ${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`, 'fa-solid fa-bookmark');
+        }
+
+        // Toast Feedback Function
+        function showToast(text, iconClass) {
+            const toast = document.getElementById('player-toast');
+            const toastText = document.getElementById('toast-text');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastText.textContent = text;
+            toastIcon.className = iconClass;
+            toastIcon.style.color = 'var(--gold)';
+
+            toast.style.opacity = '1';
+            toast.style.transform = 'translate(-50%, -50%) scale(1)';
+
+            clearTimeout(window.toastTimer);
+            window.toastTimer = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, -50%) scale(0.8)';
+            }, 800);
+        }
+
+        // Toggle Drawer Function
+        function toggleInfoDrawer() {
+            const drawer = document.getElementById('movie-info-drawer');
+            const isActive = drawer.style.transform === 'translateX(0%)';
+            drawer.style.transform = isActive ? 'translateX(-100%)' : 'translateX(0%)';
+        }
+
+        // Skip Intro Handler
+        function skipIntro() {
+            const player = document.getElementById('main-player');
+            player.currentTime = 85;
+            showToast('تم تخطي المقدمة', 'fa-solid fa-forward-step');
+        }
+
+        // Toggle Dynamic Audio/Quality Popovers
+        function toggleMenu(menuId, event) {
+            if (event) event.stopPropagation();
+            const targetMenu = document.getElementById(menuId);
+            const isVisible = targetMenu.classList.contains('active');
+
+            closeAllMenus();
+
+            if (!isVisible) {
+                targetMenu.classList.add('active');
+            }
+        }
+
+        function closeAllMenus() {
+            document.querySelectorAll('.player-popover').forEach(popover => {
+                popover.classList.remove('active');
+            });
+        }
+
+        // Close Popovers on Outside Click
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.player-popover') && !e.target.closest('.control-menu-btn')) {
+                closeAllMenus();
+            }
+        });
+    </script>
+</body>
+</html>
